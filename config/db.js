@@ -1,13 +1,21 @@
 'use strict'
+// allow for grabbing stuff from the env file
+require('dotenv').config()
 
 // creating a base name for the mongodb
 // REPLACE THE STRING WITH YOUR OWN DATABASE NAME
-const mongooseBaseName = 'WallStreet'
+
 
 // create the mongodb uri for development and test
+// this code is for a local instance of mondoDB
+// const database = {
+// 	development: `mongodb://localhost/${mongooseBaseName}-development`,
+// 	test: `mongodb://localhost/${mongooseBaseName}-test`,
+// }
+// This is for an Atlas instance of mongoDB
 const database = {
-	development: `mongodb://localhost/${mongooseBaseName}-development`,
-	test: `mongodb://localhost/${mongooseBaseName}-test`,
+	development: process.env.MONGODB_URI,
+	test: process.env.MONGODB_URI,
 }
 
 // Identify if development environment is test or development
