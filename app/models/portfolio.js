@@ -7,11 +7,15 @@ const portfolioSchema = new mongoose.Schema(
 			required: true,
 		},
 		value: {
-			type: int,
+			type: Number,
 			required: false,
 		},
 		country: {
-			type: string,
+			type: String,
+			required: false,
+		},
+		StockList: {
+			type: Array,
 			required: false,
 		},
 		owner: {
