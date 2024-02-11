@@ -21,7 +21,7 @@ const portfolioSchema = new mongoose.Schema(
 		owner: {
 			type: mongoose.Schema.Types.ObjectId,
 			ref: 'User',
-			required: true,
+			required: false,
 		},
 	},
 	{
@@ -29,4 +29,4 @@ const portfolioSchema = new mongoose.Schema(
 	}
 )
 
-module.exports = mongoose.model('porfolio', portfolioSchema)
+module.exports = mongoose.model('Porfolio', portfolioSchema)
