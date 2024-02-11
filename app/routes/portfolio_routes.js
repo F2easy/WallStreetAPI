@@ -43,19 +43,7 @@ router.get('/portfolio/:id', requireToken, (req, res, next) => {
 		.catch(next)
 })
 
-// SHOW page for individual stocks
-// GET /stock/5a7db6c74d55bc51bdf39793
-// need to know how we are going to find stocks by
-// remove the require token because we want everyone to be able to view stocks even without an account 
-router.get('/stock/:id',  (req, res, next) => {
-	// req.params.id will be set based on the `:id` in the route
-	Stock.findById(req.params.id) // what are we going to find stocks by ??????
-		.then(handle404)
-		// if `findById` is succesful, respond with 200 and "stock" JSON
-		.then((Stock) => res.status(200).json({ Stock: Stock.toObject() }))
-		// if an error occurs, pass it to the handler
-		.catch(next)
-})
+
 
 // CREATE Portfolios
 // POST /portfolio
@@ -114,6 +102,10 @@ router.delete('/portfolio/:id', requireToken, (req, res, next) => {
 		.catch(next)
 })
 
+/// Individual Stock Routes //
+
+
+
 // DESTROY will delete stocks from portfolio but might cause issues because we don't know what to use to find stocks yet
 // DELETE /portfolio/stocks/5a7db6c74d55bc51bdf39793
 // router.delete('/portfolio/stocks/:id', requireToken, (req, res, next) => {
@@ -130,5 +122,20 @@ router.delete('/portfolio/:id', requireToken, (req, res, next) => {
 // 		// if an error occurs, pass it to the handler
 // 		.catch(next)
 // })
+
+
+// SHOW page for individual stocks
+// GET /stock/5a7db6c74d55bc51bdf39793
+// need to know how we are going to find stocks by
+// remove the require token because we want everyone to be able to view stocks even without an account 
+router.get('/stock/:id',  (req, res, next) => {
+	// req.params.id will be set based on the `:id` in the route
+	Stock.findById(req.params.id) // what are we going to find stocks by ??????
+		.then(handle404)
+		// if `findById` is succesful, respond with 200 and "stock" JSON
+		.then((Stock) => res.status(200).json({ Stock: Stock.toObject() }))
+		// if an error occurs, pass it to the handler
+		.catch(next)
+})
 
 module.exports = router

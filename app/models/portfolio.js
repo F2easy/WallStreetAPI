@@ -1,5 +1,7 @@
 const mongoose = require('mongoose')
 
+const stockSchema = require('./stock')
+
 const portfolioSchema = new mongoose.Schema(
 	{
 		name: {
@@ -18,6 +20,9 @@ const portfolioSchema = new mongoose.Schema(
 			type: Array,
 			required: false,
 		},
+
+		stocks:[stockSchema],
+		
 		owner: {
 			type: mongoose.Schema.Types.ObjectId,
 			ref: 'User',
