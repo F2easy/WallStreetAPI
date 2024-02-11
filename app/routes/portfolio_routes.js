@@ -4,7 +4,7 @@ const express = require('express')
 const passport = require('passport')
 
 // pull in Mongoose model for portfolio
-const Porfolio = require('../models/Portfolio')
+const Portfolio = require('../models/Portfolio')
 
 // this is a collection of methods that help us detect situations when we need
 // to throw a custom error
@@ -29,8 +29,8 @@ const router = express.Router()
 
 // INDEX
 // GET /portfolio
-router.get('/portfolio', requireToken, (req, res, next) => {
-	Porfolio.find()
+router.get('/portfolio/:id', requireToken, (req, res, next) => {
+	Portfolio.find()
 		.then((portfolio) => {
 			// `portfolio` will be an array of Mongoose documents
 			// we want to convert each one to a POJO, so we use `.map` to
@@ -63,7 +63,7 @@ router.post('/portfolio', requireToken, (req, res, next) => {
 	// set owner of new portfolio to be current user
 	req.body.portfolio.owner = req.user.id
 
-	Porfolio.create(req.body.portfolio)
+	Portfolio.create(req.body.portfolio)
 		// respond to succesful `create` with status 201 and JSON of new "portfolio"
 		.then((portfolio) => {
 			res.status(201).json({ portfolio: portfolio.toObject() })
@@ -79,8 +79,8 @@ router.post('/portfolio', requireToken, (req, res, next) => {
 router.patch('/portfolio/:id', requireToken, removeBlanks, (req, res, next) => {
 	// if the client attempts to change the `owner` property by including a new
 	// owner, prevent that by deleting that key/value pair
-	delete req.body.portfolio.owner
-
+//	delete req.body.portfolio.owner
+  console.log(req.body)
 	Portfolio.findById(req.params.id)
 		.then(handle404)
 		.then((portfolio) => {
@@ -100,7 +100,7 @@ router.patch('/portfolio/:id', requireToken, removeBlanks, (req, res, next) => {
 // DESTROY Portfolios will also need to delte stocks from the portfolio
 // DELETE /Portfolio/5a7db6c74d55bc51bdf39793
 router.delete('/portfolio/:id', requireToken, (req, res, next) => {
-	Porfolioortfolio.findById(req.params.id)
+	Portfolio.findById(req.params.id)
 		.then(handle404)
 		.then((portfolio) => {
 			// throw an error if current user doesn't own 'portfolio`
