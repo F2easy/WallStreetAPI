@@ -1,5 +1,7 @@
 const mongoose = require('mongoose')
 
+const PortfolioSchema = require('./Portfolio')
+
 const stockSchema = new mongoose.Schema(
 	{
 		name: {
@@ -8,15 +10,19 @@ const stockSchema = new mongoose.Schema(
 		},
 		price: {
 			type: Number,
-			required: false,
+			required: true,
 		},
 		country: {
 			type: String,
-			required: false,
+			required: true,
 		},
 		industry: {
 			type: String,
-			required: false,
+			required: true,
+		},
+		summary: {
+			type: String,
+			required: true,
 		}
 	
 	},
@@ -25,4 +31,5 @@ const stockSchema = new mongoose.Schema(
 	}
 )
 
-module.exports =  stockSchema
+module.exports = mongoose.model('Stock', stockSchema)
+

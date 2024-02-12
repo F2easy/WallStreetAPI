@@ -3,9 +3,13 @@ const express = require('express')
 // Passport docs: http://www.passportjs.org/docs/
 const passport = require('passport')
 
+
+//API urls
+
+
 // pull in Mongoose model for portfolio
 const Portfolio = require('../models/Portfolio')
-
+const Stock = require('../models/stock')
 // this is a collection of methods that help us detect situations when we need
 // to throw a custom error
 const customErrors = require('../../lib/custom_errors')
@@ -102,40 +106,6 @@ router.delete('/portfolio/:id', requireToken, (req, res, next) => {
 		.catch(next)
 })
 
-/// Individual Stock Routes //
 
-
-
-// DESTROY will delete stocks from portfolio but might cause issues because we don't know what to use to find stocks yet
-// DELETE /portfolio/stocks/5a7db6c74d55bc51bdf39793
-// router.delete('/portfolio/stocks/:id', requireToken, (req, res, next) => {
-// 	Porfolioortfolio.findById(req.params.id)
-// 		.then(handle404)
-// 		.then((portfolio) => {
-// 			// throw an error if current user doesn't own 'portfolio`
-// 			requireOwnership(req, portfolio)
-// 			// delete the portfolio ONLY IF the above didn't throw
-// 			portfolio.deleteOne()
-// 		})
-// 		// send back 204 and no content if the deletion succeeded
-// 		.then(() => res.sendStatus(204))
-// 		// if an error occurs, pass it to the handler
-// 		.catch(next)
-// })
-
-
-// SHOW page for individual stocks
-// GET /stock/5a7db6c74d55bc51bdf39793
-// need to know how we are going to find stocks by
-// remove the require token because we want everyone to be able to view stocks even without an account 
-router.get('/stock/:id',  (req, res, next) => {
-	// req.params.id will be set based on the `:id` in the route
-	Stock.findById(req.params.id) // what are we going to find stocks by ??????
-		.then(handle404)
-		// if `findById` is succesful, respond with 200 and "stock" JSON
-		.then((Stock) => res.status(200).json({ Stock: Stock.toObject() }))
-		// if an error occurs, pass it to the handler
-		.catch(next)
-})
 
 module.exports = router

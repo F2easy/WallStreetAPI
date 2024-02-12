@@ -2,10 +2,12 @@
 const express = require('express')
 const mongoose = require('mongoose')
 const cors = require('cors')
+require('dotenv').config()
 
 // require route files
-const porfolioRoutes = require('./app/routes/portfolio_routes.js')
+const porfolioRoutes = require('./app/routes/stock_routes')
 const userRoutes = require('./app/routes/user_routes')
+const stockRoutes = require('./app/routes/stock_routes')
 
 // require middleware
 const errorHandler = require('./lib/error_handler')
@@ -67,7 +69,7 @@ app.use(requestLogger)
 // register route files
 app.use(porfolioRoutes)
 app.use(userRoutes)
-
+app.use(stockRoutes)
 // register error handling middleware
 // note that this comes after the route middlewares, because it needs to be
 // passed any error messages from them
