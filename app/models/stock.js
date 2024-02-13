@@ -8,23 +8,22 @@ const stockSchema = new mongoose.Schema(
 			type: String,
 			required: true,
 		},
+		symbol: {
+			type: String,
+			required: true,
+		},
 		price: {
 			type: Number,
-			required: true,
 		},
 		country: {
 			type: String,
-			required: true,
 		},
 		industry: {
 			type: String,
-			required: true,
 		},
 		summary: {
 			type: String,
-			required: true,
 		}
-	
 	},
 	{
 		timestamps: true,

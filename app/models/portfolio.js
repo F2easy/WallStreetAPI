@@ -18,8 +18,9 @@ const portfolioSchema = new mongoose.Schema(
 			required: false,
 		},
 		StockList: {
-			type: Array,
+			type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Stock' }],
 			required: false,
+
 		},
 
 		owner: {

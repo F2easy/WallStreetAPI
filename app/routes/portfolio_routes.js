@@ -106,6 +106,52 @@ router.delete('/portfolio/:id', requireToken, (req, res, next) => {
 		.catch(next)
 })
 
+// Adds Stock to stockList array in portfolio 
+// GET /add/:portfolioId/:stockId
+
+// // keeep the require token because only people with accounts can add to portfolio
+// router.put('/portfolio/:id/addtolist',  (req, res, next) => {
+// 	const symbol = req.params.id // once again using req.params.id to get the portfolio
+// 	const {stockId} = req.body 
+
+// 	// req.params.id will be set based on the `:name` in the route
+// 	Stock.findById(req.params.symbol) // we are going to find and filter stocks by symbol so we can use the companyprofile2 part of the API
+// 		.then(handle404)
+// 		// if `findById` is succesful, respond with 200 and "stock" JSON
+// 		.then((Stock) => res.status(200).json({ Stock: Stock.toObject() }))
+// 		// if an error occurs, pass it to the handler
+// 		.catch(next)
+// })
+
+
+
+router.put('/portfolio/:id/addtolist', requireToken, (req, res, next) => {
+  const portfolioId = req.params.id;
+  const stockId = req.body.stockId;
+	console.log("portfolioId:",portfolioId)	
+	console.log("stockId is:", stockId)
+  Portfolio.findById(portfolioId)
+    .then(portfolio => {
+      if (!portfolio) {
+        throw new Error('Portfolio not found');
+
+			
+      }
+
+      portfolio.StockList.push(stockId); // Add the stockId to the StockList array
+
+      return portfolio.save(); // Save the updated portfolio
+
+			
+    }) 
+    .then(() => {
+      res.sendStatus(200); // Send back 200 OK if successful
+    })  
+    .catch(error => {
+      // Pass the error to the error handler middleware
+      next(error);
+    });
+});
 
 
 module.exports = router

@@ -20,72 +20,86 @@ const requireToken = passport.authenticate('bearer', { session: false })
 // instantiate a router (mini app that only handles routes)
 const router = express.Router()
 
-// API Key
+// API Key and Variables
 KEY=process.env.API_KEY
 
 indx = process.env.INDX_URL
+//show = process.env.SHW_URL
+
+// testing with symbol for apple
+let symbol = 'AAPL'
+
+let show = `https://finnhub.io/api/v1/stock/profile2?symbol=${symbol}&token=cn2ngnhr01qt9t7uu8b0cn2ngnhr01qt9t7uu8bg`;
+// console.log(show) tested to see if url worked
 
 // STOCK ROUTES
 
 
-// DESTROY will delete stocks from portfolio but might cause issues because we don't know what to use to find stocks yet
-// DELETE /portfolio/stocks/5a7db6c74d55bc51bdf39793
-router.delete('/portfolio/stocks/:id', requireToken, (req, res, next) => {
-	Porfolio.findById(req.params.id)
-		.then(handle404)
-		.then((portfolio) => {
-			// throw an error if current user doesn't own 'portfolio`
-			requireOwnership(req, portfolio)
-			// delete the portfolio ONLY IF the above didn't throw
-			portfolio.deleteOne()
-		})
-		// send back 204 and no content if the deletion succeeded
-		.then(() => res.sendStatus(204))
-		// if an error occurs, pass it to the handler
-		.catch(next)
-})
 
 
-// SHOW page for individual stocks
-// GET /stock/5a7db6c74d55bc51bdf39793
-// need to know how we are going to find stocks by
-// remove the require token because we want everyone to be able to view stocks even without an account 
-router.get('/stock/:id',  (req, res, next) => {
-	// req.params.id will be set based on the `:id` in the route
-	Stock.findById(req.params.id) // what are we going to find stocks by ??????
-		.then(handle404)
-		// if `findById` is succesful, respond with 200 and "stock" JSON
-		.then((Stock) => res.status(200).json({ Stock: Stock.toObject() }))
-		// if an error occurs, pass it to the handler
-		.catch(next)
-})
+
+
+
+// SHOW page for stocks
+
+router.get('/stocks/:symbol', (req, res, next) => {
+ // let symbol = req.params.symbol; // Get the symbol from the request parameters
+	let symbol = "AAPL"
+  const url = `https://finnhub.io/api/v1/stock/profile2?symbol=${symbol}&token=cn2ngnhr01qt9t7uu8b0cn2ngnhr01qt9t7uu8bg`;
+
+  axios.get(url)
+    .then(apiRes => {
+      if (!apiRes.data) {
+        throw new Error('Stock not found');
+      }
+      const stockData = apiRes.data; // API response returns a single stock object
+			console.log("stockData", stockData)
+      const stock = {
+				country: stockData.country,
+        ticker: stockData.ticker,
+        logo: stockData.logo,
+        currency: stockData.currency,
+        ipo: stockData.ipo,
+				industry: stockData.finnhubIndustry,
+				name: stockData.name,
+				website: stockData.weburl
+      };
+
+      res.status(200).json({ stock });
+    })
+    .catch(error => {
+      // Pass the error to the error handler middleware
+      next(error);
+    });
+});
 
 
 // Index Page for stocks
 
 router.get('/stocks', (req, res, next) => {
-  // Making API call using axios
-  axios.get(indx) // "indx" is the API endpoint URL
+  axios.get(indx) // Assuming "indx" is the API endpoint URL
     .then(apiRes => {
       console.log('This came back from the API:\n', apiRes.data);
-      
-      // Map through the data results and extract desired properties
-      const stocks = apiRes.data.map(data => ({
-        description: data.description,
-        symbol: data.symbol,
-        currency: data.currency,
-        type: data.type
-      }));
 
-      // Respond with status 200 and JSON containing the extracted stock data
+      if (!apiRes.data) {
+        throw new Error('API response data is missing or invalid');
+      }
+
+      const stocks = apiRes.data.filter(data => data.type === "Common Stock" || data.type === "Public").filter(data => data.currency === "USD")
+        .map(data => ({
+          description: data.description,
+          symbol: data.symbol,
+          currency: data.currency,
+          type: data.type
+        }));
+
       res.status(200).json({ stocks });
     })
     .catch(error => {
-      // Pass any error to the error handler middleware
+      // Pass the error to the error handler middleware
       next(error);
     });
 });
-
 
 
 module.exports = router
