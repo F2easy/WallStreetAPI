@@ -78,7 +78,7 @@ router.get('/stocks/:symbol', (req, res, next) => {
 // Index Page for stocks
 
 router.get('/stocks', (req, res, next) => {
-  axios.get(indx) // Assuming "indx" is the API endpoint URL
+  axios.get(indx) // "indx" is the API endpoint URL
     .then(apiRes => {
       console.log('This came back from the API:\n', apiRes.data);
 
@@ -101,6 +101,36 @@ router.get('/stocks', (req, res, next) => {
       next(error);
     });
 });
+
+
+
+router.post('/add', (req,res, next) => {
+  const userId  = req.session
+
+  const myStock = req.body
+	console.log("userID is ",userId)
+	console.log("myStock akda req.body is ",myStock)
+  myStock.owner = userId
+  // default value for a checked box is 'on'
+  // this line of code coverts it 2x
+  // which results in a boolean value
+  console.log('this must be the stock: \n', myStock)
+
+  Stock.create(theStock)
+	.then((portfolio) => {
+		res.status(201).json({ portfolio: portfolio.toObject() })
+	})
+	// if an error occurs, pass it off to our error handler
+	// the error handler needs the error message and the `res` object so that it
+	// can send an error message back to the client
+	.catch(next)
+})
+
+
+
+
+
+
 
 
 module.exports = router

@@ -5,7 +5,7 @@ const cors = require('cors')
 require('dotenv').config()
 
 // require route files
-const porfolioRoutes = require('./app/routes/stock_routes')
+const portfolioRoutes = require('./app/routes/Portfolio_routes')
 const userRoutes = require('./app/routes/user_routes')
 const stockRoutes = require('./app/routes/stock_routes')
 
@@ -67,7 +67,7 @@ app.use(express.urlencoded({ extended: true }))
 app.use(requestLogger)
 
 // register route files
-app.use(porfolioRoutes)
+app.use(portfolioRoutes)
 app.use(userRoutes)
 app.use(stockRoutes)
 // register error handling middleware
