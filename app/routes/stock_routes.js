@@ -27,9 +27,9 @@ indx = process.env.INDX_URL
 //show = process.env.SHW_URL
 
 // testing with symbol for apple
-let symbol = 'AAPL'
 
-let show = `https://finnhub.io/api/v1/stock/profile2?symbol=${symbol}&token=cn2ngnhr01qt9t7uu8b0cn2ngnhr01qt9t7uu8bg`;
+
+
 // console.log(show) tested to see if url worked
 
 // STOCK ROUTES
@@ -43,8 +43,9 @@ let show = `https://finnhub.io/api/v1/stock/profile2?symbol=${symbol}&token=cn2n
 // SHOW page for stocks
 
 router.get('/stocks/:symbol', (req, res, next) => {
- // let symbol = req.params.symbol; // Get the symbol from the request parameters
-	let symbol = "AAPL"
+ //let symbol = req.params.symbol; // Get the symbol from the request parameters
+ 	//console.log("ticker:", symbol)
+ 	let symbol = "AAPL"
   const url = `https://finnhub.io/api/v1/stock/profile2?symbol=${symbol}&token=cn2ngnhr01qt9t7uu8b0cn2ngnhr01qt9t7uu8bg`;
 
   axios.get(url)
