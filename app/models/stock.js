@@ -14,13 +14,22 @@ const stockSchema = new mongoose.Schema(
 		country: {
 			type: String,
 		},
-		finnhubIndustry: {
+		industry: {
 			type: String,
 		},
 		logo: {
 			type: String,
+		},
+		website: {
+			type: String,
+		},
+		currency: {
+			type: String,
+		},
+		ipo: {
+			type: String,
 		}
-	}
+		}
 )
 
 module.exports =  stockSchema

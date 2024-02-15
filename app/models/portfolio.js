@@ -14,7 +14,7 @@ const portfolioSchema = new mongoose.Schema(
 			type: String,
 			required: false,
 		},
-		StockList: [stocksSchema],
+		stockList: [stocksSchema],
 
 		owner: {
 			type: mongoose.Schema.Types.ObjectId,

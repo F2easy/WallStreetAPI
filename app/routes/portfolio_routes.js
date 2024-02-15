@@ -72,26 +72,26 @@ router.get('/portfolio/:id', requireToken, (req, res, next) => {
 
 // UPDATE
 // PATCH /portfolio/5a7db6c74d55bc51bdf39793
-router.patch('/portfolio/:id', requireToken, removeBlanks, (req, res, next) => {
-	// if the client attempts to change the `owner` property by including a new
-	// owner, prevent that by deleting that key/value pair
-//	delete req.body.portfolio.owner
-  console.log(req.body)
-	Portfolio.findById(req.params.id)
-		.then(handle404)
-		.then((portfolio) => {
-			// pass the `req` object and the Mongoose record to `requireOwnership`
-			// it will throw an error if the current user isn't the owner
-			requireOwnership(req, portfolio)
+// router.patch('/portfolio/:id', requireToken, removeBlanks, (req, res, next) => {
+// 	// if the client attempts to change the `owner` property by including a new
+// 	// owner, prevent that by deleting that key/value pair
+// //	delete req.body.portfolio.owner
+//   //console.log(req.body)
+// 	Portfolio.findById(req.params.id)
+// 		.then(handle404)
+// 		.then((portfolio) => {
+// 			// pass the `req` object and the Mongoose record to `requireOwnership`
+// 			// it will throw an error if the current user isn't the owner
+// 			requireOwnership(req, portfolio)
 
-			// pass the result of Mongoose's `.update` to the next `.then`
-			return portfolio.updateOne(req.body.portfolio)
-		})
-		// if that succeeded, return 204 and no JSON
-		.then(() => res.sendStatus(204))
-		// if an error occurs, pass it to the handler
-		.catch(next)
-})
+// 			// pass the result of Mongoose's `.update` to the next `.then`
+// 			return portfolio.updateOne(req.body.portfolio)
+// 		})
+// 		// if that succeeded, return 204 and no JSON
+// 		.then(() => res.sendStatus(204))
+// 		// if an error occurs, pass it to the handler
+// 		.catch(next)
+// })
 
 // DESTROY Portfolios will also need to delte stocks from the portfolio
 // DELETE /Portfolio/5a7db6c74d55bc51bdf39793
@@ -114,18 +114,17 @@ router.delete('/portfolio/:id', requireToken, (req, res, next) => {
 // GET /add/:portfolioId/:stockId
 
 
-router.patch('/portfolio/:id/symbol', requireToken, (req, res, next) => {
-	const portfolioId = req.params.id;
-  const ticker = req.body.symbol;
-	console.log("portfolioId", portfolioId)
-	console.log("ticker", ticker)
-  Portfolio.findById(portfolioId)
+router.patch('/portfolio/:userId', requireToken, (req, res, next) => {
+	const userId = req.params.userId;
+	const stock = req.body
+	//console.log("req.params", req.params)
+  Portfolio.find({owner: userId})
     .then(portfolio => {
       if (!portfolio) {
         throw new Error('Portfolio not found');
       }
 
-      portfolio.stockList.push(ticker); // Add the stock symbol to the stockList array
+      portfolio.stockList.push(stock); // Add the stock symbol to the stockList array
 
       return portfolio.save(); // Save the updated portfolio
     })
@@ -161,17 +160,17 @@ router.post('/portfolio', requireToken, (req, res, next) => {
 
 router.post('/portfolio/:portfolioId/:stockSymbol', requireToken, (req, res, next) => {
   const portfolioId = req.params.id;
-  const symbol = req.body.symbol;
+  const ticker = req.params.stockSymbol;
   console.log("portfolioId:", portfolioId);
-  console.log("ticker:", ticker);
 
+	console.log("req.params", req.params);
   Portfolio.findById(portfolioId)
     .then(portfolio => {
       if (!portfolio) {
         throw new Error('Portfolio not found');
       }
 
-      portfolio.StockList.push({ ticker }); // Add the ticker as an object to the StockList array
+      portfolio.stockList.push({ ticker }); // Add the ticker as an object to the StockList array
 
       return portfolio.save(); // Save the updated portfolio
     })

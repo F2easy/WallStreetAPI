@@ -64,7 +64,7 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
 // log each request as it comes in for debugging
-app.use(requestLogger)
+//app.use(requestLogger)
 
 // register route files
 app.use(portfolioRoutes)

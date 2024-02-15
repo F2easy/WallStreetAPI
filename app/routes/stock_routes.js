@@ -45,7 +45,8 @@ indx = process.env.INDX_URL
 router.get('/stocks/:symbol', (req, res, next) => {
  //let symbol = req.params.symbol; // Get the symbol from the request parameters
  	//console.log("ticker:", symbol)
- 	let symbol = "AAPL"
+ 	let symbol = req.params.symbol
+  console.log(symbol)
   const url = `https://finnhub.io/api/v1/stock/profile2?symbol=${symbol}&token=cn2ngnhr01qt9t7uu8b0cn2ngnhr01qt9t7uu8bg`;
 
   axios.get(url)
