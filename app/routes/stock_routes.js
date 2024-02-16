@@ -46,7 +46,6 @@ router.get('/stocks/:symbol', (req, res, next) => {
  //let symbol = req.params.symbol; // Get the symbol from the request parameters
  	//console.log("ticker:", symbol)
  	let symbol = req.params.symbol
-  console.log(symbol)
   const url = `https://finnhub.io/api/v1/stock/profile2?symbol=${symbol}&token=cn2ngnhr01qt9t7uu8b0cn2ngnhr01qt9t7uu8bg`;
 
   axios.get(url)
@@ -55,7 +54,6 @@ router.get('/stocks/:symbol', (req, res, next) => {
         throw new Error('Stock not found');
       }
       const stockData = apiRes.data; // API response returns a single stock object
-			console.log("stockData", stockData)
       const stock = {
 				country: stockData.country,
         ticker: stockData.ticker,
@@ -81,7 +79,7 @@ router.get('/stocks/:symbol', (req, res, next) => {
 router.get('/stocks', (req, res, next) => {
   axios.get(indx) // "indx" is the API endpoint URL
     .then(apiRes => {
-      console.log('This came back from the API:\n', apiRes.data);
+      
 
       if (!apiRes.data) {
         throw new Error('API response data is missing or invalid');
@@ -109,13 +107,11 @@ router.post('/add', (req,res, next) => {
   const userId  = req.session
 
   const myStock = req.body
-	console.log("userID is ",userId)
-	console.log("myStock akda req.body is ",myStock)
   myStock.owner = userId
   // default value for a checked box is 'on'
   // this line of code coverts it 2x
   // which results in a boolean value
-  console.log('this must be the stock: \n', myStock)
+
 
   Stock.create(theStock)
 	.then((portfolio) => {
@@ -126,6 +122,7 @@ router.post('/add', (req,res, next) => {
 	// can send an error message back to the client
 	.catch(next)
 })
+
 
 
 

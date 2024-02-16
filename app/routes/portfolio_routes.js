@@ -30,37 +30,38 @@ const requireToken = passport.authenticate('bearer', { session: false })
 // instantiate a router (mini app that only handles routes)
 const router = express.Router()
 
-// INDEX
-// GET /portfolio
+
+
+
+// INDEX this route is to allow the logged in user to view their own portfolio
+// GET /portfolio 
 router.get('/portfolio', requireToken, (req, res, next) => {
-	Portfolio.find()
-		.then((portfolio) => {
-			// `portfolio` will be an array of Mongoose documents
-			// we want to convert each one to a POJO, so we use `.map` to
-			// apply `.toObject` to each one
-			return portfolio.map((port) => port.toObject())
-		})
-		// respond with status 200 and JSON of the portfolio
-		.then((portfolio) => res.status(200).json({ portfolio: portfolio }))
-		// if an error occurs, pass it to the handler
-		.catch(next)
-})
+  const userId = req.user._id; // Get the user ID from the authenticated user
 
-
-router.get('/portfolio/:id', requireToken, (req, res, next) => {
-  const portfolioId = req.params.id;
-
-  Portfolio.findById(portfolioId)
-    .populate('StockList', '-createdAt -updatedAt') // Populate the StockList field and exclude createdAt and updatedAt fields
-    .populate('owner', 'username') // Populate the owner field and include only the username
-    .then(portfolio => {
+  Portfolio.findOne({ owner: userId }) // Find the portfolio associated with the user ID
+    .then((portfolio) => {
       if (!portfolio) {
         throw new Error('Portfolio not found');
       }
 
-      const portfolioData = portfolio.toObject();
+      const portfolioObject = portfolio.toObject(); // Convert the portfolio to a plain JavaScript object
+      res.status(200).json({ portfolio: portfolioObject }); // Respond with the portfolio JSON
+    })
+    .catch(next);
+});
 
-      res.status(200).json({ portfolio: portfolioData });
+
+router.get('/portfolio/:userId', (req, res, next) => {
+  const userId = req.params.userId;
+
+
+  Portfolio.findOne({ owner: userId }) // Find the portfolio where the owner matches the userId
+    .then(portfolio => {
+      if (!portfolio) {
+        throw new Error('Portfolio not found');
+      }
+    	const portfolioData = portfolio.toObject();
+    	res.status(200).json({ portfolio: portfolioData });
     })
     .catch(error => {
       // Pass the error to the error handler middleware
@@ -69,31 +70,7 @@ router.get('/portfolio/:id', requireToken, (req, res, next) => {
 });
 
 
-
-// UPDATE
-// PATCH /portfolio/5a7db6c74d55bc51bdf39793
-// router.patch('/portfolio/:id', requireToken, removeBlanks, (req, res, next) => {
-// 	// if the client attempts to change the `owner` property by including a new
-// 	// owner, prevent that by deleting that key/value pair
-// //	delete req.body.portfolio.owner
-//   //console.log(req.body)
-// 	Portfolio.findById(req.params.id)
-// 		.then(handle404)
-// 		.then((portfolio) => {
-// 			// pass the `req` object and the Mongoose record to `requireOwnership`
-// 			// it will throw an error if the current user isn't the owner
-// 			requireOwnership(req, portfolio)
-
-// 			// pass the result of Mongoose's `.update` to the next `.then`
-// 			return portfolio.updateOne(req.body.portfolio)
-// 		})
-// 		// if that succeeded, return 204 and no JSON
-// 		.then(() => res.sendStatus(204))
-// 		// if an error occurs, pass it to the handler
-// 		.catch(next)
-// })
-
-// DESTROY Portfolios will also need to delte stocks from the portfolio
+// DESTROY Portfolios will also need to delete stocks from the portfolio
 // DELETE /Portfolio/5a7db6c74d55bc51bdf39793
 router.delete('/portfolio/:id', requireToken, (req, res, next) => {
 	Portfolio.findById(req.params.id)
@@ -113,19 +90,21 @@ router.delete('/portfolio/:id', requireToken, (req, res, next) => {
 // Adds Stock to stockList array in portfolio 
 // GET /add/:portfolioId/:stockId
 
-
-router.patch('/portfolio/:userId', requireToken, (req, res, next) => {
+//addStock/:portfolioId
+router.patch('/portfolio/:userId', (req, res, next) => {
 	const userId = req.params.userId;
 	const stock = req.body
-	//console.log("req.params", req.params)
-  Portfolio.find({owner: userId})
+	// console.log("stock", stock)
+	// console.log("userID", userId)
+  Portfolio.findOne({owner: userId})
     .then(portfolio => {
       if (!portfolio) {
         throw new Error('Portfolio not found');
       }
-
+			console.log("portfolio", portfolio)
+			console.log("portfolio stocklist", portfolio.stockList)
       portfolio.stockList.push(stock); // Add the stock symbol to the stockList array
-
+			
       return portfolio.save(); // Save the updated portfolio
     })
     .then(updatedPortfolio => {
@@ -158,19 +137,18 @@ router.post('/portfolio', requireToken, (req, res, next) => {
 })
 
 
-router.post('/portfolio/:portfolioId/:stockSymbol', requireToken, (req, res, next) => {
-  const portfolioId = req.params.id;
-  const ticker = req.params.stockSymbol;
-  console.log("portfolioId:", portfolioId);
 
-	console.log("req.params", req.params);
-  Portfolio.findById(portfolioId)
+// Remove stocks
+	router.delete('/portfolio/:stockID/:portID', requireToken, (req, res, next) => {
+  const stockId = req.params.stockID
+	console.log("stockId", stockId);
+	const portId = req.params.portID
+  Portfolio.findById(portId)
     .then(portfolio => {
       if (!portfolio) {
         throw new Error('Portfolio not found');
       }
-
-      portfolio.stockList.push({ ticker }); // Add the ticker as an object to the StockList array
+			portfolio.stockList.splice(portfolio.stockList.indexOf(portfolio.stockList.find((stock) => stock._id === stockId)),1)
 
       return portfolio.save(); // Save the updated portfolio
     })
@@ -181,7 +159,8 @@ router.post('/portfolio/:portfolioId/:stockSymbol', requireToken, (req, res, nex
       // Pass the error to the error handler middleware
       next(error);
     });
-});
+	});
+
 
 
 module.exports = router
