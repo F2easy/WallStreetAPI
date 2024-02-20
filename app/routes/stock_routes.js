@@ -47,13 +47,14 @@ router.get('/stocks/:symbol', (req, res, next) => {
  	//console.log("ticker:", symbol)
  	let symbol = req.params.symbol
   const url = `https://finnhub.io/api/v1/stock/profile2?symbol=${symbol}&token=cn2ngnhr01qt9t7uu8b0cn2ngnhr01qt9t7uu8bg`;
-
-  axios.get(url)
+  const urlFin = `https://finnhub.io/api/v1/quote?symbol=${symbol}&token=cn2ngnhr01qt9t7uu8b0cn2ngnhr01qt9t7uu8bg`
+  axios.get(url,urlFin)
     .then(apiRes => {
       if (!apiRes.data) {
         throw new Error('Stock not found');
       }
       const stockData = apiRes.data; // API response returns a single stock object
+     // const finData = 
       const stock = {
 				country: stockData.country,
         ticker: stockData.ticker,
@@ -62,7 +63,8 @@ router.get('/stocks/:symbol', (req, res, next) => {
         ipo: stockData.ipo,
 				industry: stockData.finnhubIndustry,
 				name: stockData.name,
-				website: stockData.weburl
+				website: stockData.weburl,
+        exchange: stockData.exchange
       };
 
       res.status(200).json({ stock });
@@ -91,6 +93,7 @@ router.get('/stocks', (req, res, next) => {
           symbol: data.symbol,
           currency: data.currency,
           type: data.type
+          
         }));
 
       res.status(200).json({ stocks });
