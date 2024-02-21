@@ -3,7 +3,8 @@ const express = require('express')
 const passport = require('passport')
 const axios = require('axios');
 const mongoose = require('mongoose');
-
+// import { Request } from 'express';
+// import { json } from 'express';
 
 // pull in Mongoose model for portfolio
 const Portfolio = require('../models/Portfolio')
@@ -24,18 +25,46 @@ const router = express.Router()
 KEY=process.env.API_KEY
 
 indx = process.env.INDX_URL
-//show = process.env.SHW_URL
-
-// testing with symbol for apple
 
 
 
-// console.log(show) tested to see if url worked
-
-// STOCK ROUTES
 
 
-
+// Route to Display Data on Home Page
+router.get('/',  (req, res, next) => {
+  
+  const generalNewsUrl = `https://finnhub.io/api/v1/news?category=general&token=cn2ngnhr01qt9t7uu8b0cn2ngnhr01qt9t7uu8bg`
+  const mergerNewsUrl = `https://finnhub.io/api/v1/news?category=merger&minId=10&token=cn2ngnhr01qt9t7uu8b0cn2ngnhr01qt9t7uu8bg`
+  const genNews = axios.get(generalNewsUrl)
+  const mergeNews = axios.get(mergerNewsUrl)
+  axios.all(getGenNews,getMergeNews)
+  console.log(genNews)
+  console.log(mergeNews)
+    .then(axios.spread((genNews,mergeNews) => {
+      const gen = genNews.data[0,1];
+      const merge = mergeNews.data[0]
+      if(!gen || !merge){
+        throw new Error('News not found');
+      }
+    const news = {
+    headlineGen: gen.headline,
+    imageGen: gen.image,
+    sourceGen: gen.source,
+    summaryGen: gen.summary,
+    urlGen: gen.url,
+    imageMerge: merge.image,
+    headlineMerge: merge.headline,
+    sourceMerge: merge.source,
+    summaryMerge: merge.summary,
+    urlMerge: merge.url
+    };
+    res.status(200).json({ news });
+  }))
+  .catch(error => {
+    // Pass the error to the error handler middleware
+    next(error);
+  });
+});
 
 
 
@@ -43,32 +72,52 @@ indx = process.env.INDX_URL
 // SHOW page for stocks
 
 router.get('/stocks/:symbol', (req, res, next) => {
- //let symbol = req.params.symbol; // Get the symbol from the request parameters
- 	//console.log("ticker:", symbol)
+
  	let symbol = req.params.symbol
-  const url = `https://finnhub.io/api/v1/stock/profile2?symbol=${symbol}&token=cn2ngnhr01qt9t7uu8b0cn2ngnhr01qt9t7uu8bg`;
-  const urlFin = `https://finnhub.io/api/v1/quote?symbol=${symbol}&token=cn2ngnhr01qt9t7uu8b0cn2ngnhr01qt9t7uu8bg`
-  axios.get(url,urlFin)
-    .then(apiRes => {
-      if (!apiRes.data) {
+  const profileUrl = `https://finnhub.io/api/v1/stock/profile2?symbol=${symbol}&token=cn2ngnhr01qt9t7uu8b0cn2ngnhr01qt9t7uu8bg`;
+  const quoteUrl = `https://finnhub.io/api/v1/quote?symbol=${symbol}&token=cn2ngnhr01qt9t7uu8b0cn2ngnhr01qt9t7uu8bg`
+  const newsUrl = `https://finnhub.io/api/v1/company-news?symbol=${symbol}&from=2023-08-15&to=2023-08-20&token=cn2ngnhr01qt9t7uu8b0cn2ngnhr01qt9t7uu8bg`
+  const getProfile = axios.get(profileUrl);
+  const getQuote = axios.get(quoteUrl);
+  const getNews = axios.get(newsUrl);
+  
+  axios.all([getProfile, getQuote, getNews])
+    .then(axios.spread((profileRes, quoteRes, newsRes) => {
+      const profileData = profileRes.data
+      const quoteData = quoteRes.data
+      const newsData = newsRes.data[1]
+      if (!profileData || !quoteData) {
         throw new Error('Stock not found');
       }
-      const stockData = apiRes.data; // API response returns a single stock object
-     // const finData = 
+      // console.log(profileData) // API response returns a single stock object
+      // console.log(quoteData) // API response returns a set of stock Prices
+      console.log("news", newsData)
       const stock = {
-				country: stockData.country,
-        ticker: stockData.ticker,
-        logo: stockData.logo,
-        currency: stockData.currency,
-        ipo: stockData.ipo,
-				industry: stockData.finnhubIndustry,
-				name: stockData.name,
-				website: stockData.weburl,
-        exchange: stockData.exchange
+				country: profileData.country,
+        ticker: profileData.ticker,
+        logo: profileData.logo,
+        currency: profileData.currency,
+        ipo: profileData.ipo,
+				industry: profileData.finnhubIndustry,
+				name: profileData.name,
+				website: profileData.weburl,
+        exchange: profileData.exchange,
+        currentPrice: quoteData.c,
+        lowPrice: quoteData.l,
+        highPrice: quoteData.h,
+        openPrice: quoteData.o,
+        prevClose: quoteData.pc,
+        change: quoteData.d,
+        percentChange: quoteData.dp,
+        companyNews: newsData.headline,
+        summary: newsData.summary,
+        newsImage: newsData.image,
+        source:  newsData.source
+  
       };
 
       res.status(200).json({ stock });
-    })
+    }))
     .catch(error => {
       // Pass the error to the error handler middleware
       next(error);
