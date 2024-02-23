@@ -33,19 +33,18 @@ indx = process.env.INDX_URL
 // Route to Display Data on Home Page
 router.get('/',  (req, res, next) => {
   
-  const generalNewsUrl = `https://finnhub.io/api/v1/news?category=general&token=cn2ngnhr01qt9t7uu8b0cn2ngnhr01qt9t7uu8bg`
-  const mergerNewsUrl = `https://finnhub.io/api/v1/news?category=merger&minId=10&token=cn2ngnhr01qt9t7uu8b0cn2ngnhr01qt9t7uu8bg`
-  const genNews = axios.get(generalNewsUrl)
-  const mergeNews = axios.get(mergerNewsUrl)
-  axios.all(getGenNews,getMergeNews)
-  console.log(genNews)
-  console.log(mergeNews)
-    .then(axios.spread((genNews,mergeNews) => {
-      const gen = genNews.data[0,1];
-      const merge = mergeNews.data[0]
-      if(!gen || !merge){
-        throw new Error('News not found');
-      }
+const generalNewsUrl = `https://finnhub.io/api/v1/news?category=general&token=cn2ngnhr01qt9t7uu8b0cn2ngnhr01qt9t7uu8bg`;
+const mergerNewsUrl = `https://finnhub.io/api/v1/news?category=merger&minId=10&token=cn2ngnhr01qt9t7uu8b0cn2ngnhr01qt9t7uu8bg`;
+
+  axios
+    .all([axios.get(generalNewsUrl), axios.get(mergerNewsUrl)])
+    .then(
+      axios.spread((genNews, mergeNews) => {
+        const gen = genNews.data[0];
+        const merge = mergeNews.data[0];
+        if (!gen || !merge) {
+          throw new Error('News not found');
+        }
     const news = {
     headlineGen: gen.headline,
     imageGen: gen.image,
