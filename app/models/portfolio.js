@@ -5,7 +5,7 @@ const stocksSchema = require('./stock')
 
 const portfolioSchema = new mongoose.Schema(
 	{
-		name: {
+		portName: {
 			type: String,
 			required: true,
 			unique: true,

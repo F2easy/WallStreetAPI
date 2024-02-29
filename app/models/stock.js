@@ -5,11 +5,11 @@ const stockSchema = new mongoose.Schema(
 	{
 		name: {
 			type: String,
-			required: true,
+			required: false,
 		},
 		ticker: {
 			type: String,
-			required: true,
+			required: false,
 		},
 		country: {
 			type: String,
