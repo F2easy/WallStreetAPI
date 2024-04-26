@@ -137,7 +137,7 @@ router.post('/portfolio', requireToken, (req, res, next) => {
 })
 
 // UPDATE
-// PATCH /pets/5a7db6c74d55bc51bdf39793
+// PATCH /portfolio/5a7db6c74d55bc51bdf39793
 router.patch('/myportfolio/:Id', requireToken, removeBlanks, (req, res, next) => {
 	// if the client attempts to change the `owner` property by including a new
 	// owner, prevent that by deleting that key/value pair
@@ -151,9 +151,11 @@ router.patch('/myportfolio/:Id', requireToken, removeBlanks, (req, res, next) =>
 			// it will throw an error if the current user isn't the owner
       console.log('req, portfolio', req && portfolio)
 			// requireOwnership(req, portfolio)
-
+      console.log('this is the req.body', req.body)
 			// pass the result of Mongoose's `.update` to the next `.then`
 			return portfolio.updateOne(req.body.portfolio)
+        .then( portfolio.save()) // Save the updated portfolio
+
 		})
 		// if that succeeded, return 204 and no JSON
 		.then(() => res.sendStatus(204))
